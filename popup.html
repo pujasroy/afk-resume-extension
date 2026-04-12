@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AFK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="logo">
+      <img src="icons/icon32.png" width="22" height="22" style="border-radius:5px" />
+      <span class="logo-text">AFK</span>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="refresh-btn" title="Re-analyze">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      </button>
+      <button class="icon-btn" id="settings-btn" title="Settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN VIEW -->
+  <div id="main-view">
+
+    <!-- Tab bar -->
+    <div class="tab-bar" id="tab-bar">
+      <button class="tab-btn active" data-tab="sessions">Sessions</button>
+      <button class="tab-btn" data-tab="timeline">Timeline</button>
+      <button class="tab-btn" data-tab="stats">Today</button>
+    </div>
+
+    <!-- SESSIONS TAB -->
+    <div id="tab-sessions">
+      <div class="empty-state" id="no-data-state" style="display:none">
+        <div class="empty-icon">👀</div>
+        <div class="empty-title">Watching your session</div>
+        <div class="empty-sub">Browse for a few minutes. AFK is tracking in the background.</div>
+      </div>
+      <div class="loading-state" id="loading-state" style="display:none">
+        <div class="spinner"></div>
+        <div class="loading-label" id="loading-label">Building your context…</div>
+      </div>
+      <div id="content" style="display:none">
+        <div class="section-header-row">
+          <span class="section-label">THIS SESSION</span>
+          <span class="section-hint">Tap a site to jump back in</span>
+        </div>
+        <div id="site-list"></div>
+      </div>
+    </div>
+
+    <!-- TIMELINE TAB -->
+    <div id="tab-timeline" style="display:none">
+      <div id="timeline-list"></div>
+      <div class="empty-state" id="timeline-empty" style="display:none">
+        <div class="empty-icon">📅</div>
+        <div class="empty-title">No timeline yet</div>
+        <div class="empty-sub">Your browsing history will appear here as you work.</div>
+      </div>
+    </div>
+
+    <!-- STATS / TODAY TAB -->
+    <div id="tab-stats" style="display:none">
+      <div class="stats-body">
+
+        <!-- Hero metrics -->
+        <div class="stats-hero">
+          <div class="stat-pill">
+            <div class="stat-pill-val" id="stat-total-time">—</div>
+            <div class="stat-pill-label">focused today</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-val" id="stat-switches">—</div>
+            <div class="stat-pill-label">context switches</div>
+          </div>
+          <div class="stat-pill accent">
+            <div class="stat-pill-val" id="stat-focus-score">—</div>
+            <div class="stat-pill-label">focus score</div>
+          </div>
+        </div>
+
+        <!-- Domain breakdown -->
+        <div class="stats-section-label">TIME BY SITE</div>
+        <div id="stats-domain-list"></div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="stats-empty" style="display:none">
+          <div class="empty-icon">📊</div>
+          <div class="empty-title">No data yet today</div>
+          <div class="empty-sub">Start browsing and your stats will appear here.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer" id="footer" style="display:none">
+      <span id="analyzed-label">—</span>
+      <span class="dot">·</span>
+      <span id="visits-label">—</span>
+    </div>
+
+  </div>
+
+  <!-- SETTINGS VIEW -->
+  <div id="settings-view" style="display:none">
+    <div class="settings-header">
+      <button class="back-btn" id="back-btn">← Back</button>
+      <span class="settings-title">Settings</span>
+    </div>
+    <div class="settings-body">
+
+      <div class="field-group">
+        <label class="field-label">Groq API Key <span class="field-optional">(optional)</span></label>
+        <div class="field-hint">For AI-generated actions. Free at console.groq.com → API Keys. Without it, smart heuristics are used.</div>
+        <input class="field-input" type="password" id="api-key-input" placeholder="gsk_…" autocomplete="off" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Away threshold</label>
+        <div class="field-hint">Show overlay when you return after being away for this long.</div>
+        <div class="row-inline">
+          <input class="field-input" type="number" id="threshold-input" min="1" max="240" value="30" style="width:72px" />
+          <span class="field-unit">minutes</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Session window</label>
+        <div class="field-hint">How far back to look when building your summary.</div>
+        <select class="field-input" id="window-select">
+          <option value="60">Last 1 hour</option>
+          <option value="120">Last 2 hours</option>
+          <option value="180" selected>Last 3 hours</option>
+          <option value="360">Last 6 hours</option>
+          <option value="480">Last 8 hours</option>
+        </select>
+      </div>
+
+      <button class="btn-primary" id="save-btn">Save</button>
+
+      <div class="danger-zone">
+        <button class="btn-danger" id="clear-btn">Clear all session data</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="popup.js"></script>
+</body>
+</html>
